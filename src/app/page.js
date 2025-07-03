@@ -12,6 +12,7 @@ export default function Page() {
   const [answer, setAnswer] = useState('');
   const [score, setScore] = useState(0);
   const [showList, setShowList] = useState(false);
+  const [showGuide, setShowGuide] = useState(false);
   const fileInputRef = useRef();
 
   useEffect(() => {
@@ -152,6 +153,25 @@ export default function Page() {
           <button onClick={checkAnswer} className="bg-blue-500 text-white p-2 rounded w-full">Gửi</button>
           <p>Điểm: {score} / {filteredList.length}</p>
         </>
+      )}
+
+      <button onClick={() => setShowGuide(true)} className="fixed bottom-4 right-4 bg-indigo-600 text-white p-2 rounded-full shadow-lg">📘 Hướng dẫn</button>
+
+      {showGuide && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-4 rounded max-w-sm w-full space-y-2">
+            <h2 className="text-lg font-bold">📘 Hướng dẫn sử dụng</h2>
+            <ul className="list-disc pl-5 text-sm space-y-1">
+              <li>Thêm từ: "từ [:nghĩa]" (VD: apple:quả táo)</li>
+              <li>Có thể thêm phiên âm: "từ /ˈæp.əl/ [:nghĩa]"</li>
+              <li>Dùng Tag để phân loại TOEIC, IELTS...</li>
+              <li>Import/Export danh sách từ dạng txt</li>
+              <li>Bắt đầu Test để luyện tập, phát âm tự động</li>
+              <li>Xem, xoá từ trong danh sách từ đã thêm</li>
+            </ul>
+            <button onClick={() => setShowGuide(false)} className="bg-indigo-600 text-white p-2 rounded w-full">Đóng</button>
+          </div>
+        </div>
       )}
     </div>
   );
