@@ -1,4 +1,3 @@
-jsx
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -25,30 +24,30 @@ export default function Page() {
   }, [vocabList]);
 
   const addWord = () => {
-    if (!input.includes(':')) return alert('Use format word [:meaning]');
+    if (!input.includes(':')) return alert('Dùng định dạng word[:meaning]');
     setVocabList([...vocabList, { entry: input.trim(), tag: tag.trim() || 'General' }]);
     setInput('');
     setTag('');
   };
 
   const deleteWord = (index) => {
-    if (!confirm('Delete this word?')) return;
+    if (!confirm('Xoá từ này?')) return;
     const updated = [...vocabList];
     updated.splice(index, 1);
     setVocabList(updated);
   };
 
   const startTest = () => {
-    if (filteredList.length === 0) return alert('No words to test.');
+    if (filteredList.length === 0) return alert('Không có từ để test.');
     setScore(0);
     setCurrentIndex(0);
     setMode('test');
-    speak(getCurrentWord());
+    speak(getWord(currentIndex));
   };
 
   const checkAnswer = () => {
-    const parts = filteredList[currentIndex].entry.split(':');
-    const meaning = parts[1] ? parts[1].trim().toLowerCase() : '';
+    const [wordRaw, meaningRaw] = filteredList[currentIndex].entry.split(':');
+    const meaning = (meaningRaw || '').trim().toLowerCase();
     if (answer.trim().toLowerCase() === meaning) {
       setScore(score + 1);
       speak('Correct');
@@ -58,9 +57,9 @@ export default function Page() {
     setAnswer('');
     if (currentIndex + 1 < filteredList.length) {
       setCurrentIndex(currentIndex + 1);
-      speak(getWordAt(currentIndex + 1));
+      speak(getWord(currentIndex + 1));
     } else {
-      alert(`Done! Your score: ${score}/${filteredList.length}`);
+      alert(`Hoàn thành! Điểm: ${score}/${filteredList.length}`);
       setMode('add');
     }
   };
@@ -68,6 +67,12 @@ export default function Page() {
   const speak = (text) => {
     const utterance = new SpeechSynthesisUtterance(text);
     speechSynthesis.speak(utterance);
+  };
+
+  const getWord = (index) => {
+    const wordRaw = filteredList[index].entry.split(':')[0].trim();
+    const phoneticMatch = wordRaw.match(/^(.*?)\s*\/(.*?)\//);
+    return phoneticMatch ? phoneticMatch[1].trim() : wordRaw;
   };
 
   const importTxt = (e) => {
@@ -98,65 +103,54 @@ export default function Page() {
 
   const filteredList = filterTag === 'All' ? vocabList : vocabList.filter(v => v.tag === filterTag);
 
-  const getCurrentWord = () => getWordAt(currentIndex);
-
-  function getWordAt(index) {
-    const parts = filteredList[index].entry.split(':')[0].trim();
-    const phoneticMatch = parts.match(/(.*?)\s*\/(.*?)\//);
-    if (phoneticMatch) {
-      return phoneticMatch[1].trim();
-    } else {
-      return parts;
-    }
-  }
-
   return (
-    <div className="p-4 space-y-4">
+    <div className="p-4 space-y-4 max-w-md mx-auto">
       <h1 className="text-xl font-bold">📘 Vocab Trainer</h1>
+
       {mode === 'add' && (
         <>
-          <input value={input} onChange={e => setInput(e.target.value)} placeholder="word [:meaning]" className="border p-2 w-full" />
-          <input value={tag} onChange={e => setTag(e.target.value)} placeholder="Tag (optional)" className="border p-2 w-full" />
+          <input value={input} onChange={e => setInput(e.target.value)} placeholder="word[:meaning]" className="border p-2 w-full" />
+          <input value={tag} onChange={e => setTag(e.target.value)} placeholder="Tag (tuỳ chọn)" className="border p-2 w-full" />
           <div className="flex space-x-2">
-            <button onClick={addWord} className="bg-blue-500 text-white p-2 rounded flex-1">Add</button>
-            <button onClick={startTest} className="bg-green-500 text-white p-2 rounded flex-1">Test</button>
+            <button onClick={addWord} className="bg-blue-500 text-white p-2 rounded flex-1">Thêm</button>
+            <button onClick={startTest} className="bg-green-500 text-white p-2 rounded flex-1">Bắt đầu Test</button>
           </div>
           <div className="flex space-x-2">
-            <button onClick={() => fileInputRef.current.click()} className="bg-yellow-500 text-white p-2 rounded flex-1">Import .txt</button>
-            <button onClick={exportTxt} className="bg-purple-500 text-white p-2 rounded flex-1">Export .txt</button>
+            <button onClick={() => fileInputRef.current.click()} className="bg-yellow-500 text-white p-2 rounded flex-1">Import</button>
+            <button onClick={exportTxt} className="bg-purple-500 text-white p-2 rounded flex-1">Export</button>
             <input ref={fileInputRef} type="file" accept=".txt" onChange={importTxt} className="hidden" />
           </div>
           <div>
-            <label>Filter Tag:</label>
+            <label>Lọc theo Tag:</label>
             <select value={filterTag} onChange={e => setFilterTag(e.target.value)} className="border p-2 w-full">
               <option>All</option>
               {[...new Set(vocabList.map(v => v.tag))].map(t => <option key={t}>{t}</option>)}
             </select>
           </div>
-          <button onClick={() => setShowList(!showList)} className="bg-gray-500 text-white p-2 rounded w-full">📄 {showList ? 'Hide' : 'Show'} Vocab List ({filteredList.length})</button>
+          <button onClick={() => setShowList(!showList)} className="bg-gray-600 text-white p-2 rounded w-full">{showList ? 'Ẩn' : 'Hiện'} Danh sách từ ({filteredList.length})</button>
           {showList && (
-            <ul className="max-h-60 overflow-y-auto border p-2 rounded">
+            <ul className="max-h-64 overflow-y-auto border p-2 rounded bg-white">
               {filteredList.map((v, i) => (
-                <li key={i} className="flex justify-between border-b py-1">
+                <li key={i} className="flex justify-between border-b py-1 text-sm">
                   <span>{v.entry} [{v.tag}]</span>
-                  <button onClick={() => deleteWord(i)} className="text-red-500">Delete</button>
+                  <button onClick={() => deleteWord(i)} className="text-red-500">X</button>
                 </li>
               ))}
             </ul>
           )}
         </>
       )}
+
       {mode === 'test' && (
         <>
-          <p>Translate: <span className="font-bold">{(() => {
-            const parts = filteredList[currentIndex].entry.split(':');
-            const word = parts[0].trim();
-            const phonetic = word.match(/\/(.*?)\//);
-            return phonetic ? `${word} [/${phonetic[1]}/]` : word;
+          <p>Hãy dịch: <span className="font-bold">{(() => {
+            const wordRaw = filteredList[currentIndex].entry.split(':')[0].trim();
+            const phonetic = wordRaw.match(/\/(.*?)\//);
+            return phonetic ? `${wordRaw} [/${phonetic[1]}/]` : wordRaw;
           })()}</span></p>
-          <input value={answer} onChange={e => setAnswer(e.target.value)} placeholder="Your Answer" className="border p-2 w-full" />
-          <button onClick={checkAnswer} className="bg-blue-500 text-white p-2 rounded w-full">Submit</button>
-          <p>Score: {score} / {filteredList.length}</p>
+          <input value={answer} onChange={e => setAnswer(e.target.value)} placeholder="Nhập nghĩa" className="border p-2 w-full" />
+          <button onClick={checkAnswer} className="bg-blue-500 text-white p-2 rounded w-full">Gửi</button>
+          <p>Điểm: {score} / {filteredList.length}</p>
         </>
       )}
     </div>
