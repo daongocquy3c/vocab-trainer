@@ -73,10 +73,18 @@ export default function Page() {
     setHistory([...history, { date: new Date().toLocaleDateString(), score }]);
   };
 
+  const playSound = (type) => {
+    const sound = new Audio(type === 'correct' ? 'https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg' : 'https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg');
+    sound.play();
+  };
+
   const checkAnswer = () => {
     const [word, meaning] = vocabList[currentWordIndex].split(':').map(e => e.trim());
     if (answer.trim() === meaning) {
       setScore(score + 1);
+      playSound('correct');
+    } else {
+      playSound('wrong');
     }
     setAnswer('');
     if (currentWordIndex + 1 < vocabList.length) {
@@ -87,7 +95,7 @@ export default function Page() {
   };
 
   return (
-    <div className={`${darkMode ? 'bg-black text-white' : 'bg-white text-black'} min-h-screen p-4`}>
+    <div className={`${darkMode ? 'bg-black text-white' : 'bg-white text-black'} min-h-screen p-4 relative`}>
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-xl font-bold">📘 Vocabulary Trainer</h1>
         <button onClick={() => setDarkMode(!darkMode)} className="border rounded px-2 py-1">
@@ -111,7 +119,7 @@ export default function Page() {
           {vocabList.length > 0 && (
             <div>
               <h2 className="font-semibold mb-2">Your Vocabulary List</h2>
-              <ul className="space-y-1">
+              <ul className="space-y-1 max-h-64 overflow-y-auto">
                 {vocabList.map((item, index) => (
                   <li key={index} className="flex justify-between items-center border p-2 rounded bg-gray-100 text-black">
                     <span>{item}</span>
@@ -161,6 +169,14 @@ export default function Page() {
           <p>Score: {score}</p>
         </div>
       )}
+
+      {/* Fixed button bottom right for author and guide */}
+      <button
+        onClick={() => alert('Tác giả: Đào Ngọc Quý\n\nHướng dẫn:\n1️⃣ Thêm từ theo cú phát: từ_tiếng_anh:nghĩa, ví dụ: name:tên\n2️⃣ Chọn thời gian test\n3️⃣ Bắt đầu test và nhập nghĩa tiếng Việt\n4️⃣ App sẽ chấm điểm tự động và lưu lịch sử.')}
+        className="fixed bottom-4 right-4 bg-gray-700 text-white px-3 py-2 rounded shadow-lg hover:bg-gray-800"
+      >
+        ℹ️ Guide
+      </button>
     </div>
   );
 }
