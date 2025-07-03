@@ -162,8 +162,8 @@ export default function Page() {
           <div className="bg-white p-4 rounded max-w-sm w-full space-y-2">
             <h2 className="text-lg font-bold">📘 Hướng dẫn sử dụng</h2>
             <ul className="list-disc pl-5 text-sm space-y-1">
-              <li>Thêm từ: "từ [:nghĩa]" (VD: apple:quả táo)</li>
-              <li>Có thể thêm phiên âm: "từ /ˈæp.əl/ [:nghĩa]"</li>
+              <li>Thêm từ: 'từ [:nghĩa]' (VD: apple:quả táo)</li>
+              <li>Có thể thêm phiên âm: 'từ /ˈæp.əl/ [:nghĩa]'</li>
               <li>Dùng Tag để phân loại TOEIC, IELTS...</li>
               <li>Import/Export danh sách từ dạng txt</li>
               <li>Bắt đầu Test để luyện tập, phát âm tự động</li>
