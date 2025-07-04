@@ -110,7 +110,13 @@ export default function Page() {
 
       {mode === 'add' && (
         <>
-          <input value={input} onChange={e => setInput(e.target.value)} placeholder="word[:meaning]" className="border p-2 w-full" />
+          <input 
+            value={input} 
+            onChange={e => setInput(e.target.value)} 
+            onKeyDown={e => { if (e.key === 'Enter') addWord(); }} 
+            placeholder="word[:meaning]" 
+            className="border p-2 w-full" 
+          />
           <input value={tag} onChange={e => setTag(e.target.value)} placeholder="Tag (tuỳ chọn)" className="border p-2 w-full" />
           <div className="flex space-x-2">
             <button onClick={addWord} className="bg-blue-500 text-white p-2 rounded flex-1">Thêm</button>
